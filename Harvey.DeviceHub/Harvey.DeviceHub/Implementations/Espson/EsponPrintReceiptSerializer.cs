@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PrinterUtility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Harvey.DeviceHub.Implementations.Espson
@@ -34,10 +35,18 @@ namespace Harvey.DeviceHub.Implementations.Espson
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Left());
             BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invoice No. : " + receipt.BillNo + "\n"));
             BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Date        : 12/12/2015\n"));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Itm                      Qty      Net   Total\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("No  Itm                      Qty      Net   Total\n"));
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, string.Format("{0,-40}{1,6}{2,9}{3,9:N2}\n", "item 1", 12, 11, 144.00));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, string.Format("{0,-40}{1,6}{2,9}{3,9:N2}\n", "item 2", 12, 11, 144.00));
+
+            if (receipt.Items.Any())
+            {
+                foreach (var item in receipt.Items)
+                {
+                    BytesValue = PrintExtensions.AddBytes(BytesValue, string.Format("{0}{1,-40}{2,6}{3,9}{4,9:N2}\n", 
+                                                                                    item.No, item.Name, item.Quantity, item.Price,  item.Amount));
+                }
+            }
+            
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Right());
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
             BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Total\n"));
