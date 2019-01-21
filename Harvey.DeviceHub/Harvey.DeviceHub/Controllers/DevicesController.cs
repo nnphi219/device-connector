@@ -19,12 +19,5 @@ namespace Harvey.DeviceHub.Controllers
             var deviceExecutor = new DeviceExecutor();
             return await deviceExecutor.ExecuteAsync(request);
         }
-
-        //[Route("{id:int}")]
-        //[HttpPost]
-        //public async Task Test(int id)
-        //{
-
-        //}
     }
 }

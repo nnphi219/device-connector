@@ -149,6 +149,8 @@
     <Compile Include="Implementations\Espson\EsponPrintReceiptSerializer.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="Models\DeviceRequest.cs" />
+    <Compile Include="Models\Receipts\Receipt.cs" />
+    <Compile Include="Models\Receipts\ReceiptItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
