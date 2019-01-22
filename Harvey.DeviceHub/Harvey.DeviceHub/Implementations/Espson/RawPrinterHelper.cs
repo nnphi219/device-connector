@@ -89,6 +89,8 @@ namespace Harvey.DeviceHub.Implementations.Espson
                 }
                 ClosePrinter(hPrinter);
             }
+
+            bSuccess = true;
             // If you did not succeed, GetLastError may give more information
             // about why not.
             if (bSuccess == false)

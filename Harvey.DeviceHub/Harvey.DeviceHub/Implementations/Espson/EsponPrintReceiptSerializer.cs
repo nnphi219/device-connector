@@ -4,7 +4,9 @@ using PrinterUtility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Web;
 
 namespace Harvey.DeviceHub.Implementations.Espson
 {
@@ -19,22 +21,28 @@ namespace Harvey.DeviceHub.Implementations.Espson
 
         private byte[] GenerateReceipt(Receipt receipt)
         {
+            var togLogoPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\tog-logo.png";
+
             PrinterUtility.EscPosEpsonCommands.EscPosEpson obj = new PrinterUtility.EscPosEpsonCommands.EscPosEpson();
             var BytesValue = Encoding.ASCII.GetBytes(string.Empty);
-            //BytesValue = PrintExtensions.AddBytes(BytesValue, GetLogo(@"D://logo1.bmp"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, ImageToByteArray(togLogoPath));
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.DoubleWidth6());
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.FontSelect.FontA());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Center());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Title\n"));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.DoubleWidth4());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Sub Title\n"));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.Nomarl());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invoice\n"));
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Left());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invoice No. : " + receipt.BillNo + "\n"));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Date        : 12/12/2015\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("TOG Connection Pte Ltd\n"));
+
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("201 Victoria Street .#05-04\n\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("SINGAPORE - 188067\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Phone: 66341967\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("E-mail: test@gmail.com\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("GST Reg No: 201229862H\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, 
+                Encoding.ASCII.GetBytes($"Bill No: {receipt.BillNo}  Date: {receipt.CreatedDate.ToString("dd/MM/yyyy")}\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue,
+                Encoding.ASCII.GetBytes($"Cashier: {receipt.CashierName}  Couter: {receipt.CounterName}\n"));
+
             BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("No  Itm                      Qty      Net   Total\n"));
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
 
@@ -46,11 +54,17 @@ namespace Harvey.DeviceHub.Implementations.Espson
                                                                                     item.No, item.Name, item.Quantity, item.Price,  item.Amount));
                 }
             }
-            
-            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Right());
+
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes($" Total Amount:           {receipt.TotalAmount}\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes($" (GST S$ {receipt.GTSAmount} Inclusive)\n"));
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Total\n"));
-            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("288.00\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes($" Net Qty: {receipt.NetQuantity}    Net Total:  {receipt.NetTotal}\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Center());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, 
+                Encoding.ASCII.GetBytes($"Retain Your Receipt for Exchange within {receipt.ExchangeDayQuantity} Days For Selected Items Only!Thanks!Please Come again\n"));
+            
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Lf());
             BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Center());
@@ -72,6 +86,13 @@ namespace Harvey.DeviceHub.Implementations.Espson
             oby.Add((byte)66);
             oby.Add((byte)3);
             return oby.ToArray();
+        }
+
+        public byte[] ImageToByteArray(string path)
+        {
+            byte[] imgdata = System.IO.File.ReadAllBytes(path);
+
+            return imgdata;
         }
     }
 }
