@@ -12,7 +12,6 @@ namespace Harvey.DeviceHub.Controllers
     [RoutePrefix("api/devices")]
     public class DevicesController : ApiController
     {
-        [Route("receipt-printer")]
         [HttpPost]
         public async Task<bool> PostReceiptPrinter([FromBody] DeviceRequest request)
         {
